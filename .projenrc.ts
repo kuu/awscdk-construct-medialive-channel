@@ -7,7 +7,7 @@ const project = new awscdk.AwsCdkConstructLibrary({
   jsiiVersion: '~5.8.9',
   name: 'awscdk-construct-medialive-channel',
   projenrcTs: true,
-  repositoryUrl: 'https://github.com/miyazaqui/awscdk-construct-medialive-channel.git',
+  repositoryUrl: 'https://github.com/kuu/awscdk-construct-medialive-channel.git',
   keywords: [
     'cdk',
     'cdk-construct',
