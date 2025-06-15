@@ -17,6 +17,7 @@ export interface MediaLiveProps {
   readonly sources: SourceSpec[]; // The list of URL of the MP4 files used by MediaLive as the sources.
   readonly destinations: CfnChannel.OutputDestinationProperty[]; // The destinations for the channel.
   readonly channelClass?: 'STANDARD' | 'SINGLE_PIPELINE'; // The class of the channel.
+  readonly vpc?: CfnChannel.VpcOutputSettingsProperty; // The VPC settings for the channel, if applicable.
   readonly encoderSpec: EncoderSettings; // The encoding settings for the channel.
 }
 
@@ -32,6 +33,7 @@ export class MediaLive extends Construct {
       sources,
       destinations,
       channelClass = 'SINGLE_PIPELINE',
+      vpc,
       encoderSpec,
     } = props;
 
@@ -93,6 +95,7 @@ export class MediaLive extends Construct {
     this.channel = createChannel(this, 'Channel', this.inputs, {
       destinations,
       channelClass,
+      vpc,
       encoderSpec,
       isAbr: true,
       timecodeInSource,
@@ -104,6 +107,7 @@ export class MediaLive extends Construct {
 interface MediaLiveInternalProps {
   readonly destinations: CfnChannel.OutputDestinationProperty[]; // The destinations for the channel.
   readonly channelClass: 'STANDARD' | 'SINGLE_PIPELINE'; // The class of the channel.
+  readonly vpc?: CfnChannel.VpcOutputSettingsProperty; // The VPC settings for the channel, if applicable.
   readonly encoderSpec: EncoderSettings; // The encoding settings for the channel.
   readonly isAbr: boolean; // Whether the channel is ABR.
   readonly timecodeInSource: boolean; // Whether the source has timecode.
@@ -120,6 +124,7 @@ function createChannel(scope: Construct, id: string, inputs: CfnInput[], props: 
   const {
     channelClass,
     destinations,
+    vpc,
     encoderSpec,
     isAbr,
     timecodeInSource,
@@ -168,6 +173,7 @@ function createChannel(scope: Construct, id: string, inputs: CfnInput[], props: 
       timecodeInSource,
       encoderSpec.timecodeBurninPrefix,
     ) : encoderSpec,
+    vpc,
   });
 }
 
