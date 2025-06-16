@@ -1,6 +1,7 @@
 import * as crypto from 'crypto';
 import { aws_iam as iam, Fn } from 'aws-cdk-lib';
 import { CfnInput, CfnChannel, CfnInputSecurityGroup } from 'aws-cdk-lib/aws-medialive';
+import { ISecret } from 'aws-cdk-lib/aws-secretsmanager';
 import { AwsCustomResource, AwsCustomResourcePolicy, PhysicalResourceId } from 'aws-cdk-lib/custom-resources';
 import { Construct } from 'constructs';
 import { EncoderMidSettings, getEncoderMidSettings, getEncodingSettings } from './MediaLiveUtil';
@@ -18,6 +19,7 @@ export interface MediaLiveProps {
   readonly destinations: CfnChannel.OutputDestinationProperty[]; // The destinations for the channel.
   readonly channelClass?: 'STANDARD' | 'SINGLE_PIPELINE'; // The class of the channel.
   readonly vpc?: CfnChannel.VpcOutputSettingsProperty; // The VPC settings for the channel, if applicable.
+  readonly secret?: ISecret; // The secret used for the MediaLive channel.
   readonly encoderSpec: EncoderSettings; // The encoding settings for the channel.
 }
 
@@ -34,6 +36,7 @@ export class MediaLive extends Construct {
       destinations,
       channelClass = 'SINGLE_PIPELINE',
       vpc,
+      secret,
       encoderSpec,
     } = props;
 
@@ -95,6 +98,7 @@ export class MediaLive extends Construct {
       destinations,
       channelClass,
       vpc,
+      secret,
       encoderSpec,
       timecodeInSource,
     });
@@ -106,6 +110,7 @@ interface MediaLiveInternalProps {
   readonly destinations: CfnChannel.OutputDestinationProperty[]; // The destinations for the channel.
   readonly channelClass: 'STANDARD' | 'SINGLE_PIPELINE'; // The class of the channel.
   readonly vpc?: CfnChannel.VpcOutputSettingsProperty; // The VPC settings for the channel, if applicable.
+  readonly secret?: ISecret; // The secret used for the MediaLive channel.
   readonly encoderSpec: EncoderSettings; // The encoding settings for the channel.
   readonly timecodeInSource: boolean; // Whether the source has timecode.
 }
@@ -122,29 +127,41 @@ function createChannel(scope: Construct, id: string, inputs: CfnInput[], props: 
     channelClass,
     destinations,
     vpc,
+    secret,
     encoderSpec,
     timecodeInSource,
   } = props;
-  // Create IAM Policy for MediaLive to access MediaPackage and S3
-  const customPolicyMediaLive = new iam.PolicyDocument({
-    statements: [
+  // Create an IAM statements
+  const statements = [
+    new iam.PolicyStatement({
+      resources: [
+        '*',
+      ],
+      actions: [
+        's3:ListBucket',
+        's3:GetObject',
+        'mediapackage:DescribeChannel',
+        'mediapackagev2:PutObject',
+      ],
+    }),
+  ];
+  if (secret) {
+    statements.push(
       new iam.PolicyStatement({
-        resources: [
-          '*',
-        ],
+        resources: [secret.secretArn],
         actions: [
-          's3:ListBucket',
-          's3:GetObject',
-          'mediapackage:DescribeChannel',
-          'mediapackagev2:PutObject',
+          'secretsmanager:GetResourcePolicy',
+          'secretsmanager:GetSecretValue',
+          'secretsmanager:DescribeSecret',
+          'secretsmanager:ListSecretVersionIds',
         ],
       }),
-    ],
-  });
-  //Create a Role for MediaLive to access MediaPackage and S3
+    );
+  }
+  //Create a Role for MediaLive to access the client's AWS resources
   const role = new iam.Role(scope, `IamRole${id}`, {
     inlinePolicies: {
-      policy: customPolicyMediaLive,
+      policy: new iam.PolicyDocument({ statements }),
     },
     managedPolicies: vpc ? [
       iam.ManagedPolicy.fromAwsManagedPolicyName('AmazonVPCFullAccess'),
