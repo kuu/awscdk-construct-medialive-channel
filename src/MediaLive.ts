@@ -1,5 +1,5 @@
 import * as crypto from 'crypto';
-import { aws_iam as iam, Fn } from 'aws-cdk-lib';
+import { aws_iam as iam, Fn, RemovalPolicy } from 'aws-cdk-lib';
 import { CfnInput, CfnChannel, CfnInputSecurityGroup } from 'aws-cdk-lib/aws-medialive';
 import { ISecret } from 'aws-cdk-lib/aws-secretsmanager';
 import { AwsCustomResource, AwsCustomResourcePolicy, PhysicalResourceId } from 'aws-cdk-lib/custom-resources';
@@ -51,11 +51,13 @@ export class MediaLive extends Construct {
 
       if (conversionType === 'NONE') {
         // Create an MP4 file input
-        return new CfnInput(this, `CfnInput-${i}`, {
+        const input = new CfnInput(this, `CfnInput-${i}`, {
           name: `${crypto.randomUUID()}`,
           type: 'MP4_FILE',
           sources: Array.from({ length: channelClass === 'STANDARD' ? 2 : 1 }, () => ({ url: url })),
         });
+        input.applyRemovalPolicy(RemovalPolicy.DESTROY);
+        return input;
       } else {
         // Create a dummy channel for embedding timecode in the source
         const fileInput = new CfnInput(this, `FileInput-${i}`, {
@@ -63,6 +65,7 @@ export class MediaLive extends Construct {
           type: 'MP4_FILE',
           sources: Array.from({ length: channelClass === 'STANDARD' ? 2 : 1 }, () => ({ url: url })),
         });
+        fileInput.applyRemovalPolicy(RemovalPolicy.DESTROY);
         const inputSecurityGroup = new CfnInputSecurityGroup(this, `InputSecurityGroup-${i}`, {
           whitelistRules: [{ cidr: '0.0.0.0/0' }],
         });
@@ -72,6 +75,7 @@ export class MediaLive extends Construct {
           inputSecurityGroups: [inputSecurityGroup.ref],
           destinations: conversionType === 'RTMP_PUSH' ? Array.from({ length: channelClass === 'STANDARD' ? 2 : 1 }, (_, j) => ({ streamName: `stream-${i}-${j}` })) : undefined,
         });
+        pushInput.applyRemovalPolicy(RemovalPolicy.DESTROY);
         const ch = createChannel(this, `${i}`, [fileInput], {
           destinations: [
             {
@@ -87,6 +91,7 @@ export class MediaLive extends Construct {
           encoderSpec: conversionSpec ? conversionSpec : getEncoderMidSettings(conversionType, i),
           timecodeInSource: false,
         });
+        ch.applyRemovalPolicy(RemovalPolicy.DESTROY);
         timecodeInSource = true;
         startChannel(this, `StartChannel-${i}`, ch.ref);
         return pushInput;
@@ -169,7 +174,7 @@ function createChannel(scope: Construct, id: string, inputs: CfnInput[], props: 
     assumedBy: new iam.ServicePrincipal('medialive.amazonaws.com'),
   });
   // Create MediaLive channel
-  return new CfnChannel(scope, `CfnChannel${id}`, {
+  const ch = new CfnChannel(scope, `CfnChannel${id}`, {
     name: `${crypto.randomUUID()}-${id}`,
     channelClass,
     roleArn: role.roleArn,
@@ -190,6 +195,8 @@ function createChannel(scope: Construct, id: string, inputs: CfnInput[], props: 
     ) : encoderSpec,
     vpc,
   });
+  ch.applyRemovalPolicy(RemovalPolicy.DESTROY);
+  return ch;
 }
 
 export function startChannel(scope: Construct, id: string, channelId: string): Date {
