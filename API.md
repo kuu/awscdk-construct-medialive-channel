@@ -218,6 +218,7 @@ const mediaLiveProps: MediaLiveProps = { ... }
 | <code><a href="#awscdk-construct-medialive-channel.MediaLiveProps.property.encoderSpec">encoderSpec</a></code> | <code><a href="#awscdk-construct-medialive-channel.EncoderMidSettings">EncoderMidSettings</a> \| aws-cdk-lib.aws_medialive.CfnChannel.EncoderSettingsProperty</code> | *No description.* |
 | <code><a href="#awscdk-construct-medialive-channel.MediaLiveProps.property.sources">sources</a></code> | <code><a href="#awscdk-construct-medialive-channel.SourceSpec">SourceSpec</a>[]</code> | *No description.* |
 | <code><a href="#awscdk-construct-medialive-channel.MediaLiveProps.property.channelClass">channelClass</a></code> | <code>string</code> | *No description.* |
+| <code><a href="#awscdk-construct-medialive-channel.MediaLiveProps.property.secret">secret</a></code> | <code>aws-cdk-lib.aws_secretsmanager.ISecret</code> | *No description.* |
 | <code><a href="#awscdk-construct-medialive-channel.MediaLiveProps.property.vpc">vpc</a></code> | <code>aws-cdk-lib.aws_medialive.CfnChannel.VpcOutputSettingsProperty</code> | *No description.* |
 
 ---
@@ -259,6 +260,16 @@ public readonly channelClass: string;
 ```
 
 - *Type:* string
+
+---
+
+##### `secret`<sup>Optional</sup> <a name="secret" id="awscdk-construct-medialive-channel.MediaLiveProps.property.secret"></a>
+
+```typescript
+public readonly secret: ISecret;
+```
+
+- *Type:* aws-cdk-lib.aws_secretsmanager.ISecret
 
 ---
 
