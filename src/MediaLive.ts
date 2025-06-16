@@ -150,6 +150,9 @@ function createChannel(scope: Construct, id: string, inputs: CfnInput[], props: 
     inlinePolicies: {
       policy: customPolicyMediaLive,
     },
+    managedPolicies: vpc ? [
+      iam.ManagedPolicy.fromAwsManagedPolicyName('AmazonVPCFullAccess'),
+    ] : [],
     assumedBy: new iam.ServicePrincipal('medialive.amazonaws.com'),
   });
   // Create MediaLive channel
