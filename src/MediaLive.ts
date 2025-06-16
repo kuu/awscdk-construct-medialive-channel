@@ -82,7 +82,6 @@ export class MediaLive extends Construct {
           ],
           channelClass,
           encoderSpec: conversionSpec ? conversionSpec : getEncoderMidSettings(conversionType, i),
-          isAbr: false,
           timecodeInSource: false,
         });
         timecodeInSource = true;
@@ -97,7 +96,6 @@ export class MediaLive extends Construct {
       channelClass,
       vpc,
       encoderSpec,
-      isAbr: true,
       timecodeInSource,
     });
 
@@ -109,7 +107,6 @@ interface MediaLiveInternalProps {
   readonly channelClass: 'STANDARD' | 'SINGLE_PIPELINE'; // The class of the channel.
   readonly vpc?: CfnChannel.VpcOutputSettingsProperty; // The VPC settings for the channel, if applicable.
   readonly encoderSpec: EncoderSettings; // The encoding settings for the channel.
-  readonly isAbr: boolean; // Whether the channel is ABR.
   readonly timecodeInSource: boolean; // Whether the source has timecode.
 }
 
@@ -126,7 +123,6 @@ function createChannel(scope: Construct, id: string, inputs: CfnInput[], props: 
     destinations,
     vpc,
     encoderSpec,
-    isAbr,
     timecodeInSource,
   } = props;
   // Create IAM Policy for MediaLive to access MediaPackage and S3
@@ -172,7 +168,6 @@ function createChannel(scope: Construct, id: string, inputs: CfnInput[], props: 
       encoderSpec.outputGroupSettingsList,
       encoderSpec.outputSettingsList,
       encoderSpec.gopLengthInSeconds,
-      isAbr,
       timecodeInSource,
       encoderSpec.timecodeBurninPrefix,
     ) : encoderSpec,
