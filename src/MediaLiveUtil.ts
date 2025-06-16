@@ -11,19 +11,21 @@ export function getEncodingSettings(
   outputGroupSettingsList: CfnChannel.OutputGroupSettingsProperty[],
   outputSettingsList: CfnChannel.OutputSettingsProperty[],
   gopLengthInSeconds: number,
-  isAbr: boolean,
   timecodeInSource: boolean,
   timecodeBurninPrefix?: string,
 
 ): CfnChannel.EncoderSettingsProperty {
   // Create output groups
   const outputGroups = [];
+  let isThereAbr = false;
   for (const [i, outputGroupSettings] of outputGroupSettingsList.entries()) {
+    const isAbr = needsAbr(outputGroupSettings);
     outputGroups.push(getOutputGroup(`outputGroup_${i}`, outputGroupSettings, outputSettingsList[i], isAbr));
+    isThereAbr ||= isAbr;
   }
   return {
     outputGroups,
-    videoDescriptions: isAbr ? [
+    videoDescriptions: isThereAbr ? [
       getVideoDescription(640, 360, 1000000, gopLengthInSeconds, timecodeBurninPrefix),
       getVideoDescription(960, 540, 2000000, gopLengthInSeconds, timecodeBurninPrefix),
       getVideoDescription(1280, 720, 3000000, gopLengthInSeconds, timecodeBurninPrefix),
@@ -40,6 +42,13 @@ export function getEncodingSettings(
       state: 'ENABLED',
     },
   };
+}
+
+function needsAbr(outputGroupSettings: CfnChannel.OutputGroupSettingsProperty): boolean {
+  return outputGroupSettings.cmafIngestGroupSettings !== undefined
+  || outputGroupSettings.hlsGroupSettings !== undefined
+  || outputGroupSettings.mediaPackageGroupSettings !== undefined
+  || outputGroupSettings.msSmoothGroupSettings !== undefined;
 }
 
 function getOutputGroup (
