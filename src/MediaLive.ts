@@ -7,7 +7,8 @@ import { Construct } from 'constructs';
 import { EncoderMidSettings, getEncoderMidSettings, getEncodingSettings } from './MediaLiveUtil';
 
 export interface SourceSpec {
-  readonly url: string; // The URL of the MP4 file.
+  readonly url: string; // The URL of the source file
+  readonly type?: 'MP4_FILE' | 'TS_FILE';
   readonly conversionType?: 'NONE' | 'RTP_PUSH' | 'RTMP_PUSH' | 'MEDIACONNECT' | 'AWS_CDI'; // Which type of conversion to perform.
   readonly conversionSpec?: CfnChannel.EncoderSettingsProperty; // The encoding settings used for the conversion.
 }
@@ -15,7 +16,7 @@ export interface SourceSpec {
 export type EncoderSettings = EncoderMidSettings | CfnChannel.EncoderSettingsProperty;
 
 export interface MediaLiveProps {
-  readonly sources: SourceSpec[]; // The list of URL of the MP4 files used by MediaLive as the sources.
+  readonly sources: SourceSpec[]; // The list of URL of the files used by MediaLive as the sources.
   readonly destinations: CfnChannel.OutputDestinationProperty[]; // The destinations for the channel.
   readonly channelClass?: 'STANDARD' | 'SINGLE_PIPELINE'; // The class of the channel.
   readonly vpc?: CfnChannel.VpcOutputSettingsProperty; // The VPC settings for the channel, if applicable.
@@ -45,15 +46,16 @@ export class MediaLive extends Construct {
     this.inputs = sources.map((source, i) => {
       const {
         url,
+        type = 'MP4_FILE',
         conversionType = 'NONE',
         conversionSpec,
       } = source;
 
       if (conversionType === 'NONE') {
-        // Create an MP4 file input
+        // Create a file input
         const input = new CfnInput(this, `CfnInput-${i}`, {
           name: `${crypto.randomUUID()}`,
-          type: 'MP4_FILE',
+          type,
           sources: Array.from({ length: channelClass === 'STANDARD' ? 2 : 1 }, () => ({ url: url })),
         });
         input.applyRemovalPolicy(RemovalPolicy.DESTROY);
@@ -62,7 +64,7 @@ export class MediaLive extends Construct {
         // Create a dummy channel for embedding timecode in the source
         const fileInput = new CfnInput(this, `FileInput-${i}`, {
           name: `${crypto.randomUUID()}`,
-          type: 'MP4_FILE',
+          type,
           sources: Array.from({ length: channelClass === 'STANDARD' ? 2 : 1 }, () => ({ url: url })),
         });
         fileInput.applyRemovalPolicy(RemovalPolicy.DESTROY);
@@ -182,7 +184,7 @@ function createChannel(scope: Construct, id: string, inputs: CfnInput[], props: 
       inputId: input.ref,
       inputAttachmentName: input.name,
       inputSettings: {
-        sourceEndBehavior: input.type === 'MP4_FILE' ? 'LOOP' : 'CONTINUE',
+        sourceEndBehavior: input.type?.endsWith('_FILE') ? 'LOOP' : 'CONTINUE',
       },
     })),
     destinations,
