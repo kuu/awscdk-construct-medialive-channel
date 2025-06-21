@@ -300,6 +300,7 @@ const sourceSpec: SourceSpec = { ... }
 | <code><a href="#awscdk-construct-medialive-channel.SourceSpec.property.url">url</a></code> | <code>string</code> | *No description.* |
 | <code><a href="#awscdk-construct-medialive-channel.SourceSpec.property.conversionSpec">conversionSpec</a></code> | <code>aws-cdk-lib.aws_medialive.CfnChannel.EncoderSettingsProperty</code> | *No description.* |
 | <code><a href="#awscdk-construct-medialive-channel.SourceSpec.property.conversionType">conversionType</a></code> | <code>string</code> | *No description.* |
+| <code><a href="#awscdk-construct-medialive-channel.SourceSpec.property.type">type</a></code> | <code>string</code> | *No description.* |
 
 ---
 
@@ -327,6 +328,16 @@ public readonly conversionSpec: EncoderSettingsProperty;
 
 ```typescript
 public readonly conversionType: string;
+```
+
+- *Type:* string
+
+---
+
+##### `type`<sup>Optional</sup> <a name="type" id="awscdk-construct-medialive-channel.SourceSpec.property.type"></a>
+
+```typescript
+public readonly type: string;
 ```
 
 - *Type:* string
