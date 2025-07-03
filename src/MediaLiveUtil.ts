@@ -5,11 +5,17 @@ export interface EncoderMidSettings {
   readonly outputSettingsList: CfnChannel.OutputSettingsProperty[]; // The settings for the outputs.
   readonly gopLengthInSeconds: number; // The length of the GOP in seconds.
   readonly timecodeBurninPrefix?: string; // The prefix for the timecode burn-in.
+  readonly framerateNumerator?: number; // The numerator for the framerate.
+  readonly framerateDenominator?: number; // The denominator for the framerate.
+  readonly scanType?: 'PROGRESSIVE' | 'INTERLACED'; // The scan type.
 }
 
 export function getEncodingSettings(
   outputGroupSettingsList: CfnChannel.OutputGroupSettingsProperty[],
   outputSettingsList: CfnChannel.OutputSettingsProperty[],
+  framerateNumerator: number,
+  framerateDenominator: number,
+  scanType: 'PROGRESSIVE' | 'INTERLACED',
   gopLengthInSeconds: number,
   timecodeInSource: boolean,
   timecodeBurninPrefix?: string,
@@ -26,11 +32,11 @@ export function getEncodingSettings(
   return {
     outputGroups,
     videoDescriptions: isThereAbr ? [
-      getVideoDescription(640, 360, 1000000, gopLengthInSeconds, timecodeBurninPrefix),
-      getVideoDescription(960, 540, 2000000, gopLengthInSeconds, timecodeBurninPrefix),
-      getVideoDescription(1280, 720, 3000000, gopLengthInSeconds, timecodeBurninPrefix),
+      getVideoDescription(640, 360, 1000000, framerateNumerator, framerateDenominator, scanType, gopLengthInSeconds, timecodeBurninPrefix),
+      getVideoDescription(960, 540, 2000000, framerateNumerator, framerateDenominator, scanType, gopLengthInSeconds, timecodeBurninPrefix),
+      getVideoDescription(1280, 720, 3000000, framerateNumerator, framerateDenominator, scanType, gopLengthInSeconds, timecodeBurninPrefix),
     ] : [
-      getVideoDescription(1280, 720, 3000000, gopLengthInSeconds, timecodeBurninPrefix),
+      getVideoDescription(1280, 720, 3000000, framerateNumerator, framerateDenominator, scanType, gopLengthInSeconds, timecodeBurninPrefix),
     ],
     audioDescriptions: [
       getAudioDescription(96000, 48000),
@@ -100,6 +106,9 @@ function getVideoDescription(
   width: number,
   height: number,
   maxBitrate: number,
+  framerateNumerator: number,
+  framerateDenominator: number,
+  scanType: 'PROGRESSIVE' | 'INTERLACED',
   gopLengthInSeconds: number,
   timecodeBurninPrefix?: string,
 ): CfnChannel.VideoDescriptionProperty {
@@ -110,8 +119,8 @@ function getVideoDescription(
     codecSettings: {
       h264Settings: {
         framerateControl: 'SPECIFIED',
-        framerateNumerator: 30000,
-        framerateDenominator: 1001,
+        framerateNumerator,
+        framerateDenominator,
         parControl: 'SPECIFIED',
         parNumerator: 1,
         parDenominator: 1,
@@ -119,7 +128,7 @@ function getVideoDescription(
         maxBitrate: maxBitrate,
         gopSize: gopLengthInSeconds,
         gopSizeUnits: 'SECONDS',
-        scanType: 'PROGRESSIVE',
+        scanType,
         timecodeBurninSettings: timecodeBurninPrefix ? {
           position: 'TOP_CENTER',
           prefix: `${timecodeBurninPrefix}_${width}x${height}`,

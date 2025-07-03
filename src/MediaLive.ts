@@ -191,6 +191,9 @@ function createChannel(scope: Construct, id: string, inputs: CfnInput[], props: 
     encoderSettings: isEncoderMidSettings(encoderSpec) ? getEncodingSettings(
       encoderSpec.outputGroupSettingsList,
       encoderSpec.outputSettingsList,
+      encoderSpec.framerateNumerator ?? 30000,
+      encoderSpec.framerateDenominator ?? 1001,
+      encoderSpec.scanType ?? 'PROGRESSIVE',
       encoderSpec.gopLengthInSeconds,
       timecodeInSource,
       encoderSpec.timecodeBurninPrefix,
