@@ -156,6 +156,9 @@ const encoderMidSettings: EncoderMidSettings = { ... }
 | <code><a href="#awscdk-construct-medialive-channel.EncoderMidSettings.property.gopLengthInSeconds">gopLengthInSeconds</a></code> | <code>number</code> | *No description.* |
 | <code><a href="#awscdk-construct-medialive-channel.EncoderMidSettings.property.outputGroupSettingsList">outputGroupSettingsList</a></code> | <code>aws-cdk-lib.aws_medialive.CfnChannel.OutputGroupSettingsProperty[]</code> | *No description.* |
 | <code><a href="#awscdk-construct-medialive-channel.EncoderMidSettings.property.outputSettingsList">outputSettingsList</a></code> | <code>aws-cdk-lib.aws_medialive.CfnChannel.OutputSettingsProperty[]</code> | *No description.* |
+| <code><a href="#awscdk-construct-medialive-channel.EncoderMidSettings.property.framerateDenominator">framerateDenominator</a></code> | <code>number</code> | *No description.* |
+| <code><a href="#awscdk-construct-medialive-channel.EncoderMidSettings.property.framerateNumerator">framerateNumerator</a></code> | <code>number</code> | *No description.* |
+| <code><a href="#awscdk-construct-medialive-channel.EncoderMidSettings.property.scanType">scanType</a></code> | <code>string</code> | *No description.* |
 | <code><a href="#awscdk-construct-medialive-channel.EncoderMidSettings.property.timecodeBurninPrefix">timecodeBurninPrefix</a></code> | <code>string</code> | *No description.* |
 
 ---
@@ -187,6 +190,36 @@ public readonly outputSettingsList: OutputSettingsProperty[];
 ```
 
 - *Type:* aws-cdk-lib.aws_medialive.CfnChannel.OutputSettingsProperty[]
+
+---
+
+##### `framerateDenominator`<sup>Optional</sup> <a name="framerateDenominator" id="awscdk-construct-medialive-channel.EncoderMidSettings.property.framerateDenominator"></a>
+
+```typescript
+public readonly framerateDenominator: number;
+```
+
+- *Type:* number
+
+---
+
+##### `framerateNumerator`<sup>Optional</sup> <a name="framerateNumerator" id="awscdk-construct-medialive-channel.EncoderMidSettings.property.framerateNumerator"></a>
+
+```typescript
+public readonly framerateNumerator: number;
+```
+
+- *Type:* number
+
+---
+
+##### `scanType`<sup>Optional</sup> <a name="scanType" id="awscdk-construct-medialive-channel.EncoderMidSettings.property.scanType"></a>
+
+```typescript
+public readonly scanType: string;
+```
+
+- *Type:* string
 
 ---
 
