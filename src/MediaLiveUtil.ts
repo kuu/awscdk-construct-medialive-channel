@@ -8,6 +8,8 @@ export interface EncoderMidSettings {
   readonly framerateNumerator?: number; // The numerator for the framerate.
   readonly framerateDenominator?: number; // The denominator for the framerate.
   readonly scanType?: 'PROGRESSIVE' | 'INTERLACED'; // The scan type.
+  readonly width?: number; // The width of the video.
+  readonly height?: number; // The height of the video.
 }
 
 export function getEncodingSettings(
@@ -16,10 +18,11 @@ export function getEncodingSettings(
   framerateNumerator: number,
   framerateDenominator: number,
   scanType: 'PROGRESSIVE' | 'INTERLACED',
+  width: number,
+  height: number,
   gopLengthInSeconds: number,
   timecodeInSource: boolean,
   timecodeBurninPrefix?: string,
-
 ): CfnChannel.EncoderSettingsProperty {
   // Create output groups
   const outputGroups = [];
@@ -32,11 +35,19 @@ export function getEncodingSettings(
   return {
     outputGroups,
     videoDescriptions: isThereAbr ? [
-      getVideoDescription(640, 360, 1000000, framerateNumerator, framerateDenominator, scanType, gopLengthInSeconds, timecodeBurninPrefix),
-      getVideoDescription(960, 540, 2000000, framerateNumerator, framerateDenominator, scanType, gopLengthInSeconds, timecodeBurninPrefix),
-      getVideoDescription(1280, 720, 3000000, framerateNumerator, framerateDenominator, scanType, gopLengthInSeconds, timecodeBurninPrefix),
+      getVideoDescription(
+        width / 4, height / 4, 1000000, framerateNumerator, framerateDenominator, scanType, gopLengthInSeconds, timecodeBurninPrefix,
+      ),
+      getVideoDescription(
+        width / 2, height / 2, 2000000, framerateNumerator, framerateDenominator, scanType, gopLengthInSeconds, timecodeBurninPrefix,
+      ),
+      getVideoDescription(
+        width, height, 3000000, framerateNumerator, framerateDenominator, scanType, gopLengthInSeconds, timecodeBurninPrefix,
+      ),
     ] : [
-      getVideoDescription(1280, 720, 3000000, framerateNumerator, framerateDenominator, scanType, gopLengthInSeconds, timecodeBurninPrefix),
+      getVideoDescription(
+        width, height, 3000000, framerateNumerator, framerateDenominator, scanType, gopLengthInSeconds, timecodeBurninPrefix,
+      ),
     ],
     audioDescriptions: [
       getAudioDescription(96000, 48000),

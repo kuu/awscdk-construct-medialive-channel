@@ -158,8 +158,10 @@ const encoderMidSettings: EncoderMidSettings = { ... }
 | <code><a href="#awscdk-construct-medialive-channel.EncoderMidSettings.property.outputSettingsList">outputSettingsList</a></code> | <code>aws-cdk-lib.aws_medialive.CfnChannel.OutputSettingsProperty[]</code> | *No description.* |
 | <code><a href="#awscdk-construct-medialive-channel.EncoderMidSettings.property.framerateDenominator">framerateDenominator</a></code> | <code>number</code> | *No description.* |
 | <code><a href="#awscdk-construct-medialive-channel.EncoderMidSettings.property.framerateNumerator">framerateNumerator</a></code> | <code>number</code> | *No description.* |
+| <code><a href="#awscdk-construct-medialive-channel.EncoderMidSettings.property.height">height</a></code> | <code>number</code> | *No description.* |
 | <code><a href="#awscdk-construct-medialive-channel.EncoderMidSettings.property.scanType">scanType</a></code> | <code>string</code> | *No description.* |
 | <code><a href="#awscdk-construct-medialive-channel.EncoderMidSettings.property.timecodeBurninPrefix">timecodeBurninPrefix</a></code> | <code>string</code> | *No description.* |
+| <code><a href="#awscdk-construct-medialive-channel.EncoderMidSettings.property.width">width</a></code> | <code>number</code> | *No description.* |
 
 ---
 
@@ -213,6 +215,16 @@ public readonly framerateNumerator: number;
 
 ---
 
+##### `height`<sup>Optional</sup> <a name="height" id="awscdk-construct-medialive-channel.EncoderMidSettings.property.height"></a>
+
+```typescript
+public readonly height: number;
+```
+
+- *Type:* number
+
+---
+
 ##### `scanType`<sup>Optional</sup> <a name="scanType" id="awscdk-construct-medialive-channel.EncoderMidSettings.property.scanType"></a>
 
 ```typescript
@@ -230,6 +242,16 @@ public readonly timecodeBurninPrefix: string;
 ```
 
 - *Type:* string
+
+---
+
+##### `width`<sup>Optional</sup> <a name="width" id="awscdk-construct-medialive-channel.EncoderMidSettings.property.width"></a>
+
+```typescript
+public readonly width: number;
+```
+
+- *Type:* number
 
 ---
 
