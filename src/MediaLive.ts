@@ -175,6 +175,7 @@ function createChannel(scope: Construct, id: string, inputs: CfnInput[], props: 
     ] : [],
     assumedBy: new iam.ServicePrincipal('medialive.amazonaws.com'),
   });
+  role.applyRemovalPolicy(RemovalPolicy.DESTROY);
   // Create MediaLive channel
   const ch = new CfnChannel(scope, `CfnChannel${id}`, {
     name: `${crypto.randomUUID()}-${id}`,
