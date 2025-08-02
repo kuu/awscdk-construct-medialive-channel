@@ -29,20 +29,20 @@ export function getEncodingSettings(
   let isThereAbr = false;
   for (const [i, outputGroupSettings] of outputGroupSettingsList.entries()) {
     const isAbr = needsAbr(outputGroupSettings);
-    outputGroups.push(getOutputGroup(`outputGroup_${i}`, outputGroupSettings, outputSettingsList[i], isAbr));
+    outputGroups.push(getOutputGroup(`outputGroup_${i}`, outputGroupSettings, outputSettingsList[i], width, height, isAbr));
     isThereAbr ||= isAbr;
   }
   return {
     outputGroups,
     videoDescriptions: isThereAbr ? [
       getVideoDescription(
-        width / 4, height / 4, 1000000, framerateNumerator, framerateDenominator, scanType, gopLengthInSeconds, timecodeBurninPrefix,
+        width, height, 3000000, framerateNumerator, framerateDenominator, scanType, gopLengthInSeconds, timecodeBurninPrefix,
       ),
       getVideoDescription(
         width / 2, height / 2, 2000000, framerateNumerator, framerateDenominator, scanType, gopLengthInSeconds, timecodeBurninPrefix,
       ),
       getVideoDescription(
-        width, height, 3000000, framerateNumerator, framerateDenominator, scanType, gopLengthInSeconds, timecodeBurninPrefix,
+        width / 4, height / 4, 1000000, framerateNumerator, framerateDenominator, scanType, gopLengthInSeconds, timecodeBurninPrefix,
       ),
     ] : [
       getVideoDescription(
@@ -72,6 +72,8 @@ function getOutputGroup (
   name: string,
   outputGroupSettings: CfnChannel.OutputGroupSettingsProperty,
   outputSettings: CfnChannel.OutputSettingsProperty,
+  width: number,
+  height: number,
   isAbr: boolean,
 ): CfnChannel.OutputGroupProperty {
   return {
@@ -79,19 +81,19 @@ function getOutputGroup (
     outputGroupSettings,
     outputs: isAbr ? [
       {
-        outputName: `${name}_640x360`,
+        outputName: `${name}_${width}x${height}`,
         outputSettings,
-        videoDescriptionName: '_640x360',
+        videoDescriptionName: `_${width}x${height}`,
       },
       {
-        outputName: `${name}_960x540`,
+        outputName: `${name}_${width / 2}x${height / 2}`,
         outputSettings,
-        videoDescriptionName: '_960x540',
+        videoDescriptionName: `_${width / 2}x${height / 2}`,
       },
       {
-        outputName: `${name}_1280x720`,
+        outputName: `${name}_${width / 4}x${height / 4}`,
         outputSettings,
-        videoDescriptionName: '_1280x720',
+        videoDescriptionName: `_${width / 4}x${height / 4}`,
       },
       {
         outputName: `${name}_96Kbps_AAC`,
@@ -104,7 +106,7 @@ function getOutputGroup (
       {
         outputName: `${name}_1280x720_96Kbps_AAC`,
         outputSettings,
-        videoDescriptionName: '_1280x720',
+        videoDescriptionName: `_${width}x${height}`,
         audioDescriptionNames: [
           '_96Kbps_AAC',
         ],
