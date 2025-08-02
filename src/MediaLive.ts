@@ -148,7 +148,7 @@ function createChannel(scope: Construct, id: string, inputs: CfnInput[], props: 
         's3:ListBucket',
         's3:GetObject',
         'mediapackage:DescribeChannel',
-        'mediapackagev2:PutObject',
+        'mediapackagev2:*',
       ],
     }),
   ];
