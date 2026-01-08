@@ -159,6 +159,7 @@ const encoderMidSettings: EncoderMidSettings = { ... }
 | <code><a href="#awscdk-construct-medialive-channel.EncoderMidSettings.property.framerateDenominator">framerateDenominator</a></code> | <code>number</code> | *No description.* |
 | <code><a href="#awscdk-construct-medialive-channel.EncoderMidSettings.property.framerateNumerator">framerateNumerator</a></code> | <code>number</code> | *No description.* |
 | <code><a href="#awscdk-construct-medialive-channel.EncoderMidSettings.property.height">height</a></code> | <code>number</code> | *No description.* |
+| <code><a href="#awscdk-construct-medialive-channel.EncoderMidSettings.property.profile">profile</a></code> | <code>string</code> | *No description.* |
 | <code><a href="#awscdk-construct-medialive-channel.EncoderMidSettings.property.scanType">scanType</a></code> | <code>string</code> | *No description.* |
 | <code><a href="#awscdk-construct-medialive-channel.EncoderMidSettings.property.timecodeBurninPrefix">timecodeBurninPrefix</a></code> | <code>string</code> | *No description.* |
 | <code><a href="#awscdk-construct-medialive-channel.EncoderMidSettings.property.width">width</a></code> | <code>number</code> | *No description.* |
@@ -222,6 +223,16 @@ public readonly height: number;
 ```
 
 - *Type:* number
+
+---
+
+##### `profile`<sup>Optional</sup> <a name="profile" id="awscdk-construct-medialive-channel.EncoderMidSettings.property.profile"></a>
+
+```typescript
+public readonly profile: string;
+```
+
+- *Type:* string
 
 ---
 

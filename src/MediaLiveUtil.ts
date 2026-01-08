@@ -10,6 +10,7 @@ export interface EncoderMidSettings {
   readonly scanType?: 'PROGRESSIVE' | 'INTERLACED'; // The scan type.
   readonly width?: number; // The width of the video.
   readonly height?: number; // The height of the video.
+  readonly profile?: string; // The H.264 profile.
 }
 
 export function getEncodingSettings(
@@ -21,6 +22,7 @@ export function getEncodingSettings(
   width: number,
   height: number,
   gopLengthInSeconds: number,
+  profile: string,
   timecodeInSource: boolean,
   timecodeBurninPrefix?: string,
 ): CfnChannel.EncoderSettingsProperty {
@@ -36,17 +38,17 @@ export function getEncodingSettings(
     outputGroups,
     videoDescriptions: isThereAbr ? [
       getVideoDescription(
-        width, height, 3000000, framerateNumerator, framerateDenominator, scanType, gopLengthInSeconds, timecodeBurninPrefix,
+        width, height, 3000000, framerateNumerator, framerateDenominator, scanType, gopLengthInSeconds, profile, timecodeBurninPrefix,
       ),
       getVideoDescription(
-        width / 2, height / 2, 2000000, framerateNumerator, framerateDenominator, scanType, gopLengthInSeconds, timecodeBurninPrefix,
+        width / 2, height / 2, 2000000, framerateNumerator, framerateDenominator, scanType, gopLengthInSeconds, profile, timecodeBurninPrefix,
       ),
       getVideoDescription(
-        width / 4, height / 4, 1000000, framerateNumerator, framerateDenominator, scanType, gopLengthInSeconds, timecodeBurninPrefix,
+        width / 4, height / 4, 1000000, framerateNumerator, framerateDenominator, scanType, gopLengthInSeconds, profile, timecodeBurninPrefix,
       ),
     ] : [
       getVideoDescription(
-        width, height, 3000000, framerateNumerator, framerateDenominator, scanType, gopLengthInSeconds, timecodeBurninPrefix,
+        width, height, 3000000, framerateNumerator, framerateDenominator, scanType, gopLengthInSeconds, profile, timecodeBurninPrefix,
       ),
     ],
     audioDescriptions: [
@@ -123,6 +125,7 @@ function getVideoDescription(
   framerateDenominator: number,
   scanType: 'PROGRESSIVE' | 'INTERLACED',
   gopLengthInSeconds: number,
+  profile: string,
   timecodeBurninPrefix?: string,
 ): CfnChannel.VideoDescriptionProperty {
   return {
@@ -148,6 +151,7 @@ function getVideoDescription(
           fontSize: 'SMALL_16',
         } : undefined,
         timecodeInsertion: 'PIC_TIMING_SEI',
+        profile,
       },
     },
   };
