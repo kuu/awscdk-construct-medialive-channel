@@ -198,6 +198,7 @@ function createChannel(scope: Construct, id: string, inputs: CfnInput[], props: 
       encoderSpec.width ?? 1920,
       encoderSpec.height ?? 1080,
       encoderSpec.gopLengthInSeconds,
+      encoderSpec.profile ?? 'MAIN',
       timecodeInSource,
       encoderSpec.timecodeBurninPrefix,
     ) : encoderSpec,
