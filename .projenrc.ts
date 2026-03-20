@@ -4,7 +4,7 @@ const project = new awscdk.AwsCdkConstructLibrary({
   authorAddress: 'miyazaqui@gmail.com',
   cdkVersion: '2.200.1',
   defaultReleaseBranch: 'main',
-  jsiiVersion: '~5.8.9',
+  jsiiVersion: '~5.9.0',
   name: 'awscdk-construct-medialive-channel',
   projenrcTs: true,
   repositoryUrl: 'https://github.com/kuu/awscdk-construct-medialive-channel.git',

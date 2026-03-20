@@ -1,4 +1,6 @@
-import { CfnChannel } from 'aws-cdk-lib/aws-medialive';
+import { Fn } from 'aws-cdk-lib';
+import { CfnChannel, CfnInput } from 'aws-cdk-lib/aws-medialive';
+import { ISecret } from 'aws-cdk-lib/aws-secretsmanager';
 
 export interface EncoderMidSettings {
   readonly outputGroupSettingsList: CfnChannel.OutputGroupSettingsProperty[]; // The settings for the output groups.
@@ -252,5 +254,33 @@ export function getEncoderMidSettings(type: string, id: number): EncoderMidSetti
       },
     ],
     gopLengthInSeconds: 1,
+  };
+}
+
+export function getSrtCallerSettings(url: string, secret?: ISecret, minimumLatency = 1000): CfnInput.SrtSettingsRequestProperty {
+  const hostPart = Fn.select(1, Fn.split('://', url));
+  const srtListenerAddress = Fn.select(0, Fn.split(':', hostPart));
+  const portPart = Fn.select(1, Fn.split(':', hostPart));
+  const srtListenerPort = Fn.select(0, Fn.split('?', portPart));
+  const paramsPart = Fn.select(1, Fn.split('?', portPart));
+  let streamId: string | undefined;
+  for (const param of Fn.split('&', paramsPart)) {
+    const [key, value] = Fn.split('=', param);
+    if (key === 'streamid') {
+      streamId = value;
+      break;
+    }
+  }
+  return {
+    srtCallerSources: [{
+      srtListenerAddress,
+      srtListenerPort,
+      streamId,
+      decryption: {
+        algorithm: 'AES128',
+        passphraseSecretArn: secret?.secretArn,
+      },
+      minimumLatency,
+    }],
   };
 }

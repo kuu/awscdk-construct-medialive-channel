@@ -4,11 +4,11 @@ import { CfnInput, CfnChannel, CfnInputSecurityGroup } from 'aws-cdk-lib/aws-med
 import { ISecret } from 'aws-cdk-lib/aws-secretsmanager';
 import { AwsCustomResource, AwsCustomResourcePolicy, PhysicalResourceId } from 'aws-cdk-lib/custom-resources';
 import { Construct } from 'constructs';
-import { EncoderMidSettings, getEncoderMidSettings, getEncodingSettings } from './MediaLiveUtil';
+import { EncoderMidSettings, getEncoderMidSettings, getEncodingSettings, getSrtCallerSettings } from './MediaLiveUtil';
 
 export interface SourceSpec {
   readonly url: string; // The URL of the source file
-  readonly type?: 'MP4_FILE' | 'TS_FILE';
+  readonly type?: 'MP4_FILE' | 'TS_FILE' | 'SRT_CALLER';
   readonly conversionType?: 'NONE' | 'RTP_PUSH' | 'RTMP_PUSH' | 'MEDIACONNECT' | 'AWS_CDI'; // Which type of conversion to perform.
   readonly conversionSpec?: CfnChannel.EncoderSettingsProperty; // The encoding settings used for the conversion.
 }
@@ -57,15 +57,17 @@ export class MediaLive extends Construct {
           name: `${crypto.randomUUID()}`,
           type,
           sources: Array.from({ length: channelClass === 'STANDARD' ? 2 : 1 }, () => ({ url: url })),
+          srtSettings: type === 'SRT_CALLER' ? getSrtCallerSettings(url, secret) : undefined,
         });
         input.applyRemovalPolicy(RemovalPolicy.DESTROY);
         return input;
       } else {
         // Create a dummy channel for embedding timecode in the source
-        const fileInput = new CfnInput(this, `FileInput-${i}`, {
+        const fileInput = new CfnInput(this, `FirstInput-${i}`, {
           name: `${crypto.randomUUID()}`,
           type,
           sources: Array.from({ length: channelClass === 'STANDARD' ? 2 : 1 }, () => ({ url: url })),
+          srtSettings: type === 'SRT_CALLER' ? getSrtCallerSettings(url, secret) : undefined,
         });
         fileInput.applyRemovalPolicy(RemovalPolicy.DESTROY);
         const inputSecurityGroup = new CfnInputSecurityGroup(this, `InputSecurityGroup-${i}`, {
