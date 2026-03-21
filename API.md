@@ -385,7 +385,7 @@ const sourceSpec: SourceSpec = { ... }
 
 | **Name** | **Type** | **Description** |
 | --- | --- | --- |
-| <code><a href="#awscdk-construct-medialive-channel.SourceSpec.property.url">url</a></code> | <code>string</code> | *No description.* |
+| <code><a href="#awscdk-construct-medialive-channel.SourceSpec.property.url">url</a></code> | <code>string \| string[]</code> | *No description.* |
 | <code><a href="#awscdk-construct-medialive-channel.SourceSpec.property.conversionSpec">conversionSpec</a></code> | <code>aws-cdk-lib.aws_medialive.CfnChannel.EncoderSettingsProperty</code> | *No description.* |
 | <code><a href="#awscdk-construct-medialive-channel.SourceSpec.property.conversionType">conversionType</a></code> | <code>string</code> | *No description.* |
 | <code><a href="#awscdk-construct-medialive-channel.SourceSpec.property.type">type</a></code> | <code>string</code> | *No description.* |
@@ -395,10 +395,10 @@ const sourceSpec: SourceSpec = { ... }
 ##### `url`<sup>Required</sup> <a name="url" id="awscdk-construct-medialive-channel.SourceSpec.property.url"></a>
 
 ```typescript
-public readonly url: string;
+public readonly url: string | string[];
 ```
 
-- *Type:* string
+- *Type:* string | string[]
 
 ---
 

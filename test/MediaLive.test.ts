@@ -20,6 +20,13 @@ test('Create MediaLive', () => {
         type: 'SRT_CALLER',
         url: 'srt://example.com:1234?streamid=example',
       },
+      {
+        type: 'MEDIACONNECT',
+        url: [
+          'arn:aws:mediaconnect:us-east-1:123456789012:flow:az1',
+          'arn:aws:mediaconnect:us-east-1:123456789012:flow:az2',
+        ],
+      },
     ],
     destinations: [{
       id: 'MediaPackageV1',
