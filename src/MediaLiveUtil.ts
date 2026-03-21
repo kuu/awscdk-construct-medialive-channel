@@ -257,7 +257,32 @@ export function getEncoderMidSettings(type: string, id: number): EncoderMidSetti
   };
 }
 
-export function getSrtCallerSettings(url: string, secret?: ISecret, minimumLatency = 1000): CfnInput.SrtSettingsRequestProperty {
+export function getUrlList(url: string | string[], channelClass: 'STANDARD' | 'SINGLE_PIPELINE'): { url: string }[] {
+  if (Array.isArray(url)) {
+    return url.map(u => ({ url: u }));
+  } else {
+    return Array.from({ length: channelClass === 'STANDARD' ? 2 : 1 }, () => ({ url }));
+  }
+}
+
+export function getSrtCallerSettings(
+  url: string | string[],
+  channelClass: 'STANDARD' | 'SINGLE_PIPELINE',
+  secret?: ISecret,
+  minimumLatency = 1000,
+): CfnInput.SrtSettingsRequestProperty {
+  if (Array.isArray(url)) {
+    const srtSettings: CfnInput.SrtCallerSourceRequestProperty[] = [];
+    for (const u of url) {
+      let { srtCallerSources } = getSrtCallerSettings(
+        u, channelClass, secret, minimumLatency,
+      ) as { srtCallerSources: CfnInput.SrtCallerSourceRequestProperty[] };
+      srtSettings.push(srtCallerSources[0]);
+    }
+    return {
+      srtCallerSources: srtSettings,
+    };
+  }
   const hostPart = Fn.select(1, Fn.split('://', url));
   const srtListenerAddress = Fn.select(0, Fn.split(':', hostPart));
   const portPart = Fn.select(1, Fn.split(':', hostPart));
@@ -271,16 +296,17 @@ export function getSrtCallerSettings(url: string, secret?: ISecret, minimumLaten
       break;
     }
   }
+  const srtCallerSource = {
+    srtListenerAddress,
+    srtListenerPort,
+    streamId,
+    decryption: {
+      algorithm: 'AES128',
+      passphraseSecretArn: secret?.secretArn,
+    },
+    minimumLatency,
+  };
   return {
-    srtCallerSources: [{
-      srtListenerAddress,
-      srtListenerPort,
-      streamId,
-      decryption: {
-        algorithm: 'AES128',
-        passphraseSecretArn: secret?.secretArn,
-      },
-      minimumLatency,
-    }],
+    srtCallerSources: Array.from({ length: channelClass === 'STANDARD' ? 2 : 1 }, () => srtCallerSource),
   };
 }

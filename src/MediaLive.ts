@@ -4,11 +4,11 @@ import { CfnInput, CfnChannel, CfnInputSecurityGroup } from 'aws-cdk-lib/aws-med
 import { ISecret } from 'aws-cdk-lib/aws-secretsmanager';
 import { AwsCustomResource, AwsCustomResourcePolicy, PhysicalResourceId } from 'aws-cdk-lib/custom-resources';
 import { Construct } from 'constructs';
-import { EncoderMidSettings, getEncoderMidSettings, getEncodingSettings, getSrtCallerSettings } from './MediaLiveUtil';
+import { EncoderMidSettings, getEncoderMidSettings, getEncodingSettings, getUrlList, getSrtCallerSettings } from './MediaLiveUtil';
 
 export interface SourceSpec {
-  readonly url: string; // The URL of the source file
-  readonly type?: 'MP4_FILE' | 'TS_FILE' | 'SRT_CALLER';
+  readonly url: string | string[]; // The URL(s) of the source file
+  readonly type?: 'MP4_FILE' | 'TS_FILE' | 'SRT_CALLER' | 'MEDIACONNECT';
   readonly conversionType?: 'NONE' | 'RTP_PUSH' | 'RTMP_PUSH' | 'MEDIACONNECT' | 'AWS_CDI'; // Which type of conversion to perform.
   readonly conversionSpec?: CfnChannel.EncoderSettingsProperty; // The encoding settings used for the conversion.
 }
@@ -56,8 +56,9 @@ export class MediaLive extends Construct {
         const input = new CfnInput(this, `CfnInput-${i}`, {
           name: `${crypto.randomUUID()}`,
           type,
-          sources: Array.from({ length: channelClass === 'STANDARD' ? 2 : 1 }, () => ({ url: url })),
-          srtSettings: type === 'SRT_CALLER' ? getSrtCallerSettings(url, secret) : undefined,
+          sources: getUrlList(url, channelClass),
+          srtSettings: type === 'SRT_CALLER' ? getSrtCallerSettings(url, channelClass, secret) : undefined,
+          mediaConnectFlows: type === 'MEDIACONNECT' ? getUrlList(url, channelClass).map(u => ({ flowArn: u.url })) : undefined,
         });
         input.applyRemovalPolicy(RemovalPolicy.DESTROY);
         return input;
@@ -66,8 +67,9 @@ export class MediaLive extends Construct {
         const fileInput = new CfnInput(this, `FirstInput-${i}`, {
           name: `${crypto.randomUUID()}`,
           type,
-          sources: Array.from({ length: channelClass === 'STANDARD' ? 2 : 1 }, () => ({ url: url })),
-          srtSettings: type === 'SRT_CALLER' ? getSrtCallerSettings(url, secret) : undefined,
+          sources: getUrlList(url, channelClass),
+          srtSettings: type === 'SRT_CALLER' ? getSrtCallerSettings(url, channelClass, secret) : undefined,
+          mediaConnectFlows: type === 'MEDIACONNECT' ? getUrlList(url, channelClass).map(u => ({ flowArn: u.url })) : undefined,
         });
         fileInput.applyRemovalPolicy(RemovalPolicy.DESTROY);
         const inputSecurityGroup = new CfnInputSecurityGroup(this, `InputSecurityGroup-${i}`, {
