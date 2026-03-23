@@ -1,6 +1,7 @@
-import { Fn } from 'aws-cdk-lib';
+import { Fn, RemovalPolicy, aws_iam as iam } from 'aws-cdk-lib';
 import { CfnChannel, CfnInput } from 'aws-cdk-lib/aws-medialive';
 import { ISecret } from 'aws-cdk-lib/aws-secretsmanager';
+import { Construct } from 'constructs';
 
 export interface EncoderMidSettings {
   readonly outputGroupSettingsList: CfnChannel.OutputGroupSettingsProperty[]; // The settings for the output groups.
@@ -263,6 +264,29 @@ export function getUrlList(url: string | string[], channelClass: 'STANDARD' | 'S
   } else {
     return Array.from({ length: channelClass === 'STANDARD' ? 2 : 1 }, () => ({ url }));
   }
+}
+
+export function getMediaConnectRole(scope: Construct, id: string): iam.IRole {
+  //Create a Role for MediaLive to access MediaConnect flows
+  const role = new iam.Role(scope, `IamRole${id}`, {
+    inlinePolicies: {
+      policy: new iam.PolicyDocument({
+        statements: [
+          new iam.PolicyStatement({
+            resources: ['*'],
+            actions: [
+              'mediaconnect:ManagedDescribeFlow',
+              'mediaconnect:ManagedAddOutput',
+              'mediaconnect:ManagedRemoveOutput',
+            ],
+          }),
+        ],
+      }),
+    },
+    assumedBy: new iam.ServicePrincipal('medialive.amazonaws.com'),
+  });
+  role.applyRemovalPolicy(RemovalPolicy.DESTROY);
+  return role;
 }
 
 export function getSrtCallerSettings(
