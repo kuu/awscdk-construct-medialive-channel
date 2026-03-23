@@ -4,7 +4,14 @@ import { CfnInput, CfnChannel, CfnInputSecurityGroup } from 'aws-cdk-lib/aws-med
 import { ISecret } from 'aws-cdk-lib/aws-secretsmanager';
 import { AwsCustomResource, AwsCustomResourcePolicy, PhysicalResourceId } from 'aws-cdk-lib/custom-resources';
 import { Construct } from 'constructs';
-import { EncoderMidSettings, getEncoderMidSettings, getEncodingSettings, getUrlList, getSrtCallerSettings } from './MediaLiveUtil';
+import {
+  EncoderMidSettings,
+  getEncoderMidSettings,
+  getEncodingSettings,
+  getUrlList,
+  getSrtCallerSettings,
+  getMediaConnectRole,
+} from './MediaLiveUtil';
 
 export interface SourceSpec {
   readonly url: string | string[]; // The URL(s) of the source file
@@ -21,6 +28,7 @@ export interface MediaLiveProps {
   readonly channelClass?: 'STANDARD' | 'SINGLE_PIPELINE'; // The class of the channel.
   readonly vpc?: CfnChannel.VpcOutputSettingsProperty; // The VPC settings for the channel, if applicable.
   readonly secret?: ISecret; // The secret used for the MediaLive channel.
+
   readonly encoderSpec: EncoderSettings; // The encoding settings for the channel.
 }
 
@@ -59,6 +67,7 @@ export class MediaLive extends Construct {
           sources: type === 'MEDIACONNECT' ? undefined : getUrlList(url, channelClass),
           srtSettings: type === 'SRT_CALLER' ? getSrtCallerSettings(url, channelClass, secret) : undefined,
           mediaConnectFlows: type === 'MEDIACONNECT' ? getUrlList(url, channelClass).map(u => ({ flowArn: u.url })) : undefined,
+          roleArn: type === 'MEDIACONNECT' ? getMediaConnectRole(this, `MediaConnectRole-${i}`).roleArn : undefined,
         });
         input.applyRemovalPolicy(RemovalPolicy.DESTROY);
         return input;
@@ -70,6 +79,7 @@ export class MediaLive extends Construct {
           sources: type === 'MEDIACONNECT' ? undefined : getUrlList(url, channelClass),
           srtSettings: type === 'SRT_CALLER' ? getSrtCallerSettings(url, channelClass, secret) : undefined,
           mediaConnectFlows: type === 'MEDIACONNECT' ? getUrlList(url, channelClass).map(u => ({ flowArn: u.url })) : undefined,
+          roleArn: type === 'MEDIACONNECT' ? getMediaConnectRole(this, `MediaConnectRole-${i}`).roleArn : undefined,
         });
         fileInput.applyRemovalPolicy(RemovalPolicy.DESTROY);
         const inputSecurityGroup = new CfnInputSecurityGroup(this, `InputSecurityGroup-${i}`, {
