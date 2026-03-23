@@ -56,7 +56,7 @@ export class MediaLive extends Construct {
         const input = new CfnInput(this, `CfnInput-${i}`, {
           name: `${crypto.randomUUID()}`,
           type,
-          sources: getUrlList(url, channelClass),
+          sources: type === 'MEDIACONNECT' ? undefined : getUrlList(url, channelClass),
           srtSettings: type === 'SRT_CALLER' ? getSrtCallerSettings(url, channelClass, secret) : undefined,
           mediaConnectFlows: type === 'MEDIACONNECT' ? getUrlList(url, channelClass).map(u => ({ flowArn: u.url })) : undefined,
         });
@@ -67,7 +67,7 @@ export class MediaLive extends Construct {
         const fileInput = new CfnInput(this, `FirstInput-${i}`, {
           name: `${crypto.randomUUID()}`,
           type,
-          sources: getUrlList(url, channelClass),
+          sources: type === 'MEDIACONNECT' ? undefined : getUrlList(url, channelClass),
           srtSettings: type === 'SRT_CALLER' ? getSrtCallerSettings(url, channelClass, secret) : undefined,
           mediaConnectFlows: type === 'MEDIACONNECT' ? getUrlList(url, channelClass).map(u => ({ flowArn: u.url })) : undefined,
         });
